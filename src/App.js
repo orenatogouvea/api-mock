@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import mockData from './mockData';
 
 function App() {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredData = mockData.filter((trip) =>
+    trip.segments.some((segment) =>
+      segment.legs.some((leg) =>
+        leg.seats.some((seat) =>
+          `${seat.passenger.firstName} ${seat.passenger.lastName}`
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        )
+      )
+    )
+  );
+
   return (
     <div className="App">
       <h1>Informações de Viagem</h1>
+      <input
+        type="text"
+        placeholder="Buscar por nome"
+        value={searchTerm}
+        onChange={handleSearchChange}
+      />
       <table>
         <thead>
           <tr>
@@ -25,10 +49,14 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {mockData.map((trip, tripIndex) =>
+          {filteredData.map((trip, tripIndex) =>
             trip.segments.map((segment, segmentIndex) =>
               segment.legs.map((leg, legIndex) =>
-                leg.seats.map((seat, seatIndex) => (
+                leg.seats.filter((seat) =>
+                  `${seat.passenger.firstName} ${seat.passenger.lastName}`
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+                ).map((seat, seatIndex) => (
                   <tr key={`${tripIndex}-${segmentIndex}-${legIndex}-${seatIndex}`}>
                     <td>{seat.passenger.firstName} {seat.passenger.lastName}</td>
                     <td>{seat.passenger.documentNumber}</td>
