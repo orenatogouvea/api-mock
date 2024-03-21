@@ -1,18 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import './App.css';
-import mockData from './mockData';
+import mockData from "./mockData";
 
-function App() {
-  const [searchTerm, setSearchTerm] = useState('');
+export interface Trip {
+  source: string;
+  tripType: string;
+  totalMiles: string;
+  totalMoney: string;
+  date: string;
+  orderId: string;
+  status: string;
+  segments: Segment[];
+}
 
-  const handleSearchChange = (event) => {
+interface Segment {
+  busType: string;
+  segment: string;
+  refundable: string;
+  stops: string;
+  legs: Leg[];
+}
+
+interface Leg {
+  busClass: string;
+  busCompanyCode: string;
+  busCompanyName: string;
+  arrivalBusStationCode: string;
+  departureBusStationCode: string;
+  departureCity: string;
+  departureState: string;
+  arrivalCity: string;
+  arrivalState: string;
+  departureDate: string;
+  arrivalDate: string;
+  seats: Seat[];
+}
+
+interface Seat {
+  chosenCost: string;
+  costMiles: string;
+  busFareAmount: string;
+  costMoney: string;
+  recordLocator: string;
+  seatNumber: string;
+  ticketNumber: string;
+  partnerTransactionId: string;
+  serviceId: string;
+  bookingClass: string;
+  paxDocument: string;
+  busPassengerId: string;
+  passenger: Passenger;
+}
+
+interface Passenger {
+  indexGDS: string;
+  firstName: string;
+  lastName: string;
+  type: string;
+  documentNumber: string;
+  documentType: string;
+}
+
+const App: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredData = mockData.filter((trip) =>
-    trip.segments.some((segment) =>
-      segment.legs.some((leg) =>
-        leg.seats.some((seat) =>
+  const filteredData: Trip[] = mockData.filter((trip: Trip) =>
+    trip.segments.some((segment: Segment) =>
+      segment.legs.some((leg: Leg) =>
+        leg.seats.some((seat: Seat) =>
           `${seat.passenger.firstName} ${seat.passenger.lastName}`
             .toLowerCase()
             .includes(searchTerm.toLowerCase())
@@ -49,14 +108,14 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((trip, tripIndex) =>
-            trip.segments.map((segment, segmentIndex) =>
-              segment.legs.map((leg, legIndex) =>
-                leg.seats.filter((seat) =>
+          {filteredData.map((trip: Trip, tripIndex: number) =>
+            trip.segments.map((segment: Segment, segmentIndex: number) =>
+              segment.legs.map((leg: Leg, legIndex: number) =>
+                leg.seats.filter((seat: Seat) =>
                   `${seat.passenger.firstName} ${seat.passenger.lastName}`
                     .toLowerCase()
                     .includes(searchTerm.toLowerCase())
-                ).map((seat, seatIndex) => (
+                ).map((seat: Seat, seatIndex: number) => (
                   <tr key={`${tripIndex}-${segmentIndex}-${legIndex}-${seatIndex}`}>
                     <td>{seat.passenger.firstName} {seat.passenger.lastName}</td>
                     <td>{seat.passenger.documentNumber}</td>
